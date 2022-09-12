@@ -1,12 +1,11 @@
-/**
- * Sample Skeleton for 'Scene.fxml' Controller Class
- */
-
 package it.polito.tdp.itunes;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import it.polito.tdp.itunes.model.Album;
+import it.polito.tdp.itunes.model.BilancioAlbum;
 import it.polito.tdp.itunes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,52 +18,102 @@ public class FXMLController {
 	
 	private Model model;
 
-    @FXML // ResourceBundle that was given to the FXMLLoader
+	
+    @FXML
     private ResourceBundle resources;
 
-    @FXML // URL location of the FXML file that was given to the FXMLLoader
+    @FXML
     private URL location;
 
-    @FXML // fx:id="btnAdiacenze"
-    private Button btnAdiacenze; // Value injected by FXMLLoader
+    @FXML
+    private Button btnAdiacenze;
+    
+    @FXML
+    private Button btnCreaGrafo;
 
-    @FXML // fx:id="btnCreaGrafo"
-    private Button btnCreaGrafo; // Value injected by FXMLLoader
+    @FXML
+    private Button btnPercorso;
 
-    @FXML // fx:id="btnPercorso"
-    private Button btnPercorso; // Value injected by FXMLLoader
+    @FXML
+    private ComboBox<Album> cmbA1;
 
-    @FXML // fx:id="cmbA1"
-    private ComboBox<?> cmbA1; // Value injected by FXMLLoader
+    @FXML 
+    private ComboBox<?> cmbA2;
 
-    @FXML // fx:id="cmbA2"
-    private ComboBox<?> cmbA2; // Value injected by FXMLLoader
+    @FXML
+    private TextField txtN;
 
-    @FXML // fx:id="txtN"
-    private TextField txtN; // Value injected by FXMLLoader
+    @FXML 
+    private TextArea txtResult; 
 
-    @FXML // fx:id="txtResult"
-    private TextArea txtResult; // Value injected by FXMLLoader
+    @FXML 
+    private TextField txtX; 
 
-    @FXML // fx:id="txtX"
-    private TextField txtX; // Value injected by FXMLLoader
-
+    
+    
     @FXML
     void doCalcolaAdiacenze(ActionEvent event) {
     	
+    	txtResult.clear();
+    	
+    	
+    	if(cmbA1.getItems().isEmpty()) {
+    		txtResult.setText("ERRORE: Creare prima un grafo.");
+    		return;
+    	}
+    	
+    	Album a = cmbA1.getValue();
+    	
+    	if(a==null) {
+    		txtResult.setText("ERRORE: Selezionare un album.");
+    		return; 
+    	}
+    	
+    	
+    	for(BilancioAlbum b : model.getSuccessori(a)) {
+    		txtResult.appendText(b.toString()+"\n");
+    	}
+    		
     }
+    
 
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
     	
     }
 
+    
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	
+    	txtResult.clear();
+    	
+    	
+    	int n; 
+    	
+    	try {
+    		
+    		n = Integer.parseInt(txtN.getText());
+    		
+    	} catch(NumberFormatException e){
+    		txtResult.setText("ERRORE: Inserire numero canzoni correttamente.");
+    		return;
+    	}
+    	
+    	
+    	model.creaGrafo(n);
+    	txtResult.appendText("Grafo creato.");
+    	txtResult.appendText("\nNumero vertici grafo: "+model.getNumVertici());
+    	txtResult.appendText("\nNumero archi grafo: "+model.getNumArchi());
+    	
+    	
+    	cmbA1.getItems().setAll(model.getVertici());
+    	
     }
 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+    
+    
+    @FXML
     void initialize() {
         assert btnAdiacenze != null : "fx:id=\"btnAdiacenze\" was not injected: check your FXML file 'Scene.fxml'.";
         assert btnCreaGrafo != null : "fx:id=\"btnCreaGrafo\" was not injected: check your FXML file 'Scene.fxml'.";
@@ -81,4 +130,6 @@ public class FXMLController {
     public void setModel(Model model) {
     	this.model = model;
     }
+
+
 }

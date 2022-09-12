@@ -14,10 +14,11 @@ public class DBConnect {
 	public static Connection getConnection() {
 
 		if (ds == null) {
+			
 			HikariConfig config = new HikariConfig();
 			config.setJdbcUrl(jdbcURL);
 			config.setUsername("root");
-			config.setPassword("rootroot");
+			config.setPassword("moustache");
 			
 			// configurazione MySQL
 			config.addDataSourceProperty("cachePrepStmts", "true");

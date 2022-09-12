@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import it.polito.tdp.itunes.model.Album;
 import it.polito.tdp.itunes.model.Artist;
 import it.polito.tdp.itunes.model.Genre;
@@ -16,127 +18,84 @@ import it.polito.tdp.itunes.model.Track;
 
 public class ItunesDAO {
 	
-	public List<Album> getAllAlbums(){
-		final String sql = "SELECT * FROM Album";
+	//METODO CHE RESTITUISCE LA LISTA DEI VERTICI
+	//(ALBUM CHE RISPETTANO IL VINCOLO):
+	public List<Album> getVertici(int n){
+		
+		final String sql = "SELECT DISTINCT a.* "
+						 + "FROM track t, album a "
+						 + "WHERE t.AlbumId = a.AlbumId "
+						 + "GROUP BY t.AlbumId "
+						 + "HAVING COUNT(DISTINCT t.TrackId)>?";
+		
 		List<Album> result = new LinkedList<>();
 		
 		try {
+			
 			Connection conn = DBConnect.getConnection();
+			
 			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
+			st.setInt(1, n);
 
+			ResultSet res = st.executeQuery();
 			while (res.next()) {
-				result.add(new Album(res.getInt("AlbumId"), res.getString("Title")));
+				
+				result.add(new Album(res.getInt("AlbumId"), 
+									 res.getString("Title"),
+									 res.getInt("ArtistId")));
 			}
+			
 			conn.close();
+			
+			return result;
+			
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			System.out.println("Errore nel metodo getVertici().");
 			throw new RuntimeException("SQL Error");
 		}
-		return result;
+		
 	}
 	
-	public List<Artist> getAllArtists(){
-		final String sql = "SELECT * FROM Artist";
-		List<Artist> result = new LinkedList<>();
-		
-		try {
-			Connection conn = DBConnect.getConnection();
-			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
-
-			while (res.next()) {
-				result.add(new Artist(res.getInt("ArtistId"), res.getString("Name")));
-			}
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQL Error");
-		}
-		return result;
-	}
 	
-	public List<Playlist> getAllPlaylists(){
-		final String sql = "SELECT * FROM Playlist";
-		List<Playlist> result = new LinkedList<>();
+	//METODO CHE RESTITUISCE IL NUMERO DI CANZONI DELL'ALBUM DATO:
+	public int getNumCanzoni (int a_id, int n) {
+		
+		final String sql = "SELECT COUNT(DISTINCT t.TrackId) AS num "
+						 + "FROM track t, album a "
+						 + "WHERE t.AlbumId = a.AlbumId AND a.AlbumId = ? "
+						 + "GROUP BY t.AlbumId "
+						 + "HAVING COUNT(DISTINCT t.TrackId)>?";
+		
+		Integer result = null;
 		
 		try {
+			
 			Connection conn = DBConnect.getConnection();
+			
 			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
+			st.setInt(1, a_id);
+			st.setInt(2, n);
 
-			while (res.next()) {
-				result.add(new Playlist(res.getInt("PlaylistId"), res.getString("Name")));
-			}
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQL Error");
-		}
-		return result;
-	}
-	
-	public List<Track> getAllTracks(){
-		final String sql = "SELECT * FROM Track";
-		List<Track> result = new ArrayList<Track>();
-		
-		try {
-			Connection conn = DBConnect.getConnection();
-			PreparedStatement st = conn.prepareStatement(sql);
 			ResultSet res = st.executeQuery();
-
 			while (res.next()) {
-				result.add(new Track(res.getInt("TrackId"), res.getString("Name"), 
-						res.getString("Composer"), res.getInt("Milliseconds"), 
-						res.getInt("Bytes"),res.getDouble("UnitPrice")));
+				
+				result = res.getInt("num"); 
 			
 			}
+			
 			conn.close();
+			
+			return result;
+			
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			System.out.println("Errore nel metodo getNumCanzoni().");
 			throw new RuntimeException("SQL Error");
 		}
-		return result;
 	}
 	
-	public List<Genre> getAllGenres(){
-		final String sql = "SELECT * FROM Genre";
-		List<Genre> result = new LinkedList<>();
-		
-		try {
-			Connection conn = DBConnect.getConnection();
-			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
-
-			while (res.next()) {
-				result.add(new Genre(res.getInt("GenreId"), res.getString("Name")));
-			}
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQL Error");
-		}
-		return result;
-	}
-	
-	public List<MediaType> getAllMediaTypes(){
-		final String sql = "SELECT * FROM MediaType";
-		List<MediaType> result = new LinkedList<>();
-		
-		try {
-			Connection conn = DBConnect.getConnection();
-			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
-
-			while (res.next()) {
-				result.add(new MediaType(res.getInt("MediaTypeId"), res.getString("Name")));
-			}
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQL Error");
-		}
-		return result;
-	}
 	
 }

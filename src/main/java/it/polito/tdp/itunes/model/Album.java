@@ -1,15 +1,22 @@
 package it.polito.tdp.itunes.model;
 
 public class Album {
+	
 	private Integer albumId;
 	private String title;
+	private Integer artistId;
 	
-	public Album(Integer albumId, String title) {
-		super();
+	
+	
+	public Album(Integer albumId, String title, Integer artistId) {
+		
 		this.albumId = albumId;
 		this.title = title;
+		this.artistId = artistId;
 	}
 
+	
+	
 	public Integer getAlbumId() {
 		return albumId;
 	}
@@ -18,6 +25,7 @@ public class Album {
 		this.albumId = albumId;
 	}
 
+	
 	public String getTitle() {
 		return title;
 	}
@@ -25,6 +33,16 @@ public class Album {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+
+	public Integer getArtistId() {
+		return artistId;
+	}
+
+	public void setArtistId(Integer artistId) {
+		this.artistId = artistId;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -51,11 +69,11 @@ public class Album {
 		return true;
 	}
 	
+	
 	@Override
 	public String toString() {
 		return title;
 	}
-	
 	
 	
 }
